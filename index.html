@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My GitHub Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .profile-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .profile-info img {
+            border-radius: 50%;
+            max-width: 150px;
+        }
+        .profile-info p {
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GitHub Profile Details</h1>
+        <div>
+            <input type="text" id="username" placeholder="Enter GitHub username" />
+            <button onclick="fetchGitHubProfile()">Search</button>
+        </div>
+
+        <div id="profile" class="profile-info"></div>
+        <div id="error-message" class="error"></div>
+    </div>
+
+    <script>
+        function fetchGitHubProfile() {
+            const username = document.getElementById("username").value;
+            const profileDiv = document.getElementById("profile");
+            const errorDiv = document.getElementById("error-message");
+
+            profileDiv.innerHTML = '';
+            errorDiv.innerHTML = '';
+
+            if (!username) {
+                errorDiv.innerText = 'Please enter a username.';
+                return;
+            }
+
+            fetch(`https://api.github.com/users/${username}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('User not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const profileHTML = `
+                        <div style="text-align: center;">
+                            <img src="${data.avatar_url}" alt="${data.login}" />
+                            <h2>${data.name || 'No name available'}</h2>
+                            <p><strong>Username:</strong> ${data.login}</p>
+                            <p><strong>Bio:</strong> ${data.bio || 'No bio available'}</p>
+                            <p><strong>Location:</strong> ${data.location || 'No location available'}</p>
+                            <p><strong>Followers:</strong> ${data.followers}</p>
+                            <p><strong>Following:</strong> ${data.following}</p>
+                            <p><strong>Public Repos:</strong> ${data.public_repos}</p>
+                        </div>
+                    `;
+                    profileDiv.innerHTML = profileHTML;
+                })
+                .catch(error => {
+                    errorDiv.innerText = `Error: ${error.message}`;
+                });
+        }
+    </script>
+</body>
+</html>
